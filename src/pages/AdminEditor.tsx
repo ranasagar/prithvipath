@@ -15,6 +15,7 @@ import type { Article, ArticleStatus } from "@/src/types";
 import { motion, AnimatePresence } from "motion/react";
 
 import NepaliInput from "@/src/components/ui/NepaliInput";
+import RichNepaliEditor from "@/src/components/ui/RichNepaliEditor";
 
 import AlertModal from "@/src/components/ui/AlertModal";
 import ConfirmModal from "@/src/components/ui/ConfirmModal";
@@ -355,12 +356,11 @@ export default function AdminEditor() {
                 <Globe size={14} className="text-primary" /> मुख्य सामग्री (Content)
                 <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold">नेपाली अनुवाद समर्थित</span>
               </label>
-              <NepaliInput 
+              <RichNepaliEditor
                 value={article.content || ""}
                 onChange={handleContentChange}
                 placeholder="समाचारको मुख्य सामग्री यहाँ लेख्नुहोस्... (अङ्ग्रेजीमा लेखेपछि नेपालीमा स्वचालित अनुवाद हुन्छ)"
                 className="w-full bg-white border border-slate-100 rounded-[2rem] p-8 text-lg font-medium text-slate-600 outline-none focus:ring-4 focus:ring-primary/5 transition-all shadow-sm"
-                type="textarea"
                 rows={12}
               />
             </div>

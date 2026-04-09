@@ -60,10 +60,15 @@ export default function AdminDashboard() {
       
       setSeeding(false);
       if (result.success) {
+        // Wait a moment for Firestore to process, then refresh the page
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+        
         setAlertInfo({
           show: true,
           title: "सफलता!",
-          message: "डेटाबेस सफलतापूर्वक सीड गरियो!",
+          message: "डेटाबेस सफलतापूर्वक सीड गरियो! पृष्ठ ताजा हुँदैछ...",
           type: 'success'
         });
       } else {

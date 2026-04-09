@@ -106,26 +106,26 @@ export default function AIGeneratorModal({ isOpen, onClose, onSuccess }: AIGener
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="relative w-full max-w-2xl sm:max-w-4xl bg-white rounded-2xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
         {/* Header */}
-        <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center shadow-inner">
-              <Sparkles size={24} />
+        <div className="p-4 sm:p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 text-primary rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner flex-shrink-0">
+              <Sparkles size={20} className="sm:w-6 sm:h-6" />
             </div>
-            <div>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">AI समाचार सिर्जना</h2>
-              <p className="text-sm font-medium text-slate-500">ताजा र ट्रेन्डिङ समाचारहरू स्वचालित रूपमा तयार पार्नुहोस्।</p>
+            <div className="min-w-0">
+              <h2 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight truncate">AI समाचार सिर्जना</h2>
+              <p className="text-xs sm:text-sm font-medium text-slate-500 line-clamp-1 sm:line-clamp-2">ताजा र ट्रेन्डिङ समाचारहरू स्वचालित रूपमा तयार पार्नुहोस्।</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
-            <X size={24} />
+          <button onClick={onClose} className="p-1 sm:p-2 text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0">
+            <X size={20} className="sm:w-6 sm:h-6" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-grow overflow-y-auto p-8">
+        <div className="flex-grow overflow-y-auto p-4 sm:p-8">
           {!generatedData ? (
             <div className="max-w-xl mx-auto py-12 text-center space-y-8">
               <div className="space-y-4">
@@ -156,22 +156,24 @@ export default function AIGeneratorModal({ isOpen, onClose, onSuccess }: AIGener
               <button
                 onClick={handleGenerate}
                 disabled={isGenerating || !selectedCategory}
-                className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-slate-900/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none"
+                className="w-full bg-slate-900 text-white py-3 sm:py-5 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg flex items-center justify-center gap-2 sm:gap-3 shadow-xl shadow-slate-900/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none"
               >
                 {isGenerating ? (
                   <>
-                    <Loader2 className="animate-spin" size={24} />
-                    खोज्दै र लेख्दै...
+                    <Loader2 className="animate-spin w-5 h-5 sm:w-6 sm:h-6" />
+                    <span className="hidden sm:inline">खोज्दै र लेख्दै...</span>
+                    <span className="sm:hidden">तयार पार्दै...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles size={24} />
-                    AI समाचार तयार पार्नुहोस्
+                    <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <span className="hidden sm:inline">AI समाचार तयार पार्नुहोस्</span>
+                    <span className="sm:hidden">समाचार तयार</span>
                   </>
                 )}
               </button>
               
-              <p className="text-xs font-medium text-slate-400">
+              <p className="text-xs sm:text-sm font-medium text-slate-400">
                 * यसले गुगल सर्च प्रयोग गरेर आजका ताजा समाचारहरू खोज्नेछ र नेपालीमा लेख्नेछ।
               </p>
             </div>
@@ -235,25 +237,25 @@ export default function AIGeneratorModal({ isOpen, onClose, onSuccess }: AIGener
 
         {/* Footer */}
         {generatedData && (
-          <div className="p-8 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between gap-4">
+          <div className="p-4 sm:p-8 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
             <button 
               onClick={() => setGeneratedData(null)}
-              className="px-6 py-4 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-colors"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-4 rounded-lg sm:rounded-2xl font-bold text-xs sm:text-base text-slate-500 hover:bg-slate-100 transition-colors"
             >
-              फेरि प्रयास गर्नुहोस्
+              फेरि प्रयास
             </button>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
               <button 
                 onClick={() => handleSave('draft')}
-                className="px-8 py-4 rounded-2xl font-bold text-slate-900 bg-white border-2 border-slate-200 hover:border-slate-300 transition-all flex items-center gap-2"
+                className="flex-1 sm:flex-none px-3 sm:px-8 py-2.5 sm:py-4 rounded-lg sm:rounded-2xl font-bold text-xs sm:text-base text-slate-900 bg-white border-2 border-slate-200 hover:border-slate-300 transition-all flex items-center justify-center gap-1 sm:gap-2"
               >
-                <Save size={20} /> ड्राफ्टमा राख्नुहोस्
+                <Save className="w-4 h-4 sm:w-5 sm:h-5" /> <span className="hidden sm:inline">ड्राफ्टमा राख्नुहोस्</span><span className="sm:hidden">ड्राफ्ट</span>
               </button>
               <button 
                 onClick={() => handleSave('published')}
-                className="px-8 py-4 rounded-2xl font-black text-white bg-primary shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                className="flex-1 sm:flex-none px-3 sm:px-8 py-2.5 sm:py-4 rounded-lg sm:rounded-2xl font-black text-xs sm:text-base text-white bg-primary shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-1 sm:gap-2"
               >
-                <Globe size={20} /> प्रकाशित गर्नुहोस्
+                <Globe className="w-4 h-4 sm:w-5 sm:h-5" /> <span className="hidden sm:inline">प्रकाशित गर्नुहोस्</span><span className="sm:hidden">प्रकाशित</span>
               </button>
             </div>
           </div>

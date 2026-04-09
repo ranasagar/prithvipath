@@ -232,15 +232,15 @@ export default function Header() {
 
           {/* Combined Navigation Menu (Desktop) */}
           <nav className="hidden md:block lg:block ml-2">
-            <ul className="flex items-center gap-2 md:gap-3 lg:gap-5">
+            <ul className="flex items-center gap-2 md:gap-2 lg:gap-3 flex-wrap">
               <li>
                 <Link to="/" className="text-[11px] md:text-xs lg:text-xs font-black text-slate-900 hover:text-primary transition-colors uppercase truncate">गृहपृष्ठ</Link>
               </li>
-              {categories.slice(0, 5).map((cat) => (
+              {categories.map((cat) => (
                 <li key={cat.id} className="hidden lg:block">
                   <Link 
                     to={`/category/${cat.slug}`} 
-                    className="text-xs font-bold text-slate-600 hover:text-primary transition-colors uppercase tracking-tight truncate max-w-[80px]"
+                    className="text-xs font-bold text-slate-600 hover:text-primary transition-colors uppercase tracking-tight truncate max-w-[100px] whitespace-nowrap"
                     title={cat.name}
                   >
                     {cat.name}
