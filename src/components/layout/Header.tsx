@@ -59,7 +59,7 @@ export default function Header() {
     }
   };
 
-  const [logoUrl, setLogoUrl] = useState("/logo.png");
+  const [logoUrl, setLogoUrl] = useState("https://ui-avatars.com/api/?name=P+P&background=0072B5&color=fff&size=128&rounded=true");
 
   useEffect(() => {
     // Listen for global site settings (logo, corner radius)

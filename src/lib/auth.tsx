@@ -68,32 +68,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signOut(auth);
   };
 
+  // Helper function to retry Firestore operations with exponential backoff
+  const retryFirestoreOperation = async <T,>(
+    operation: () => Promise<T>,
+    maxRetries: number = 3,
+    delayMs: number = 1000
+  ): Promise<T> => {
+    let lastError: any;
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (err: any) {
+        lastError = err;
+        const isOfflineError = err.message?.includes('offline') || err.code === 'FIRESTORE/UNAVAILABLE';
+        if (isOfflineError && attempt < maxRetries - 1) {
+          const delay = delayMs * Math.pow(2, attempt);
+          console.warn(`Firestore offline, retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        throw err;
+      }
+    }
+    throw lastError;
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          const userRef = doc(db, 'users', firebaseUser.uid);
-          const userDoc = await getDoc(userRef);
-          
-          if (userDoc.exists()) {
-            setUser(userDoc.data() as User);
-          } else {
-            // User exists in Auth but not in Firestore, create profile (e.g. from Google login)
-            const newUser: User = {
-              uid: firebaseUser.uid,
-              email: firebaseUser.email || '',
-              displayName: firebaseUser.displayName || '',
-              role: firebaseUser.email === 'sagarrana@gmail.com' ? 'admin' : 'user',
-              photoURL: firebaseUser.photoURL || undefined,
-              createdAt: new Date().toISOString(),
-            };
+          await retryFirestoreOperation(async () => {
+            const userRef = doc(db, 'users', firebaseUser.uid);
+            const userDoc = await getDoc(userRef);
             
-            await setDoc(userRef, newUser);
-            setUser(newUser);
-          }
+            if (userDoc.exists()) {
+              setUser(userDoc.data() as User);
+            } else {
+              // User exists in Auth but not in Firestore, create profile (e.g. from Google login)
+              const newUser: User = {
+                uid: firebaseUser.uid,
+                email: firebaseUser.email || '',
+                displayName: firebaseUser.displayName || '',
+                role: firebaseUser.email === 'sagarrana@gmail.com' ? 'admin' : 'user',
+                photoURL: firebaseUser.photoURL || undefined,
+                createdAt: new Date().toISOString(),
+              };
+              
+              await setDoc(userRef, newUser);
+              setUser(newUser);
+            }
+          }, 3, 1000);
         } catch (err) {
           console.error('Error fetching/creating user profile:', err);
-          setError('Failed to load user profile');
+          setError('Failed to load user profile. Please check your connection and refresh.');
         } finally {
           setLoading(false);
         }

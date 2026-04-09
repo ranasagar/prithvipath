@@ -20,7 +20,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }: AdminSideb
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [logoUrl, setLogoUrl] = useState("/logo.png");
+  const [logoUrl, setLogoUrl] = useState("https://ui-avatars.com/api/?name=P+P&background=0072B5&color=fff&size=128&rounded=true");
   const [logoVerticalUrl, setLogoVerticalUrl] = useState("/logo-vertical.png");
 
   useEffect(() => {

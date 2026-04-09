@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [logoUrl, setLogoUrl] = useState("/logo.png");
+  const [logoUrl, setLogoUrl] = useState("https://ui-avatars.com/api/?name=P+P&background=0072B5&color=fff&size=128&rounded=true");
   const navigate = useNavigate();
   const { signIn, signUp } = useAuth();
 

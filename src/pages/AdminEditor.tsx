@@ -24,7 +24,7 @@ export default function AdminEditor() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   
-  const [logoUrl, setLogoUrl] = useState("/logo.png");
+  const [logoUrl, setLogoUrl] = useState("https://ui-avatars.com/api/?name=P+P&background=0072B5&color=fff&size=128&rounded=true");
   const [districtSearch, setDistrictSearch] = useState("");
   const [alertInfo, setAlertInfo] = useState({
     show: false,
