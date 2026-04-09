@@ -151,7 +151,7 @@ const RichNepaliEditor = forwardRef<HTMLTextAreaElement, RichNepaliEditorProps>(
 
         {/* Tips */}
         <div className="text-xs text-slate-500 font-medium space-y-1 p-3 bg-blue-50 rounded-lg border border-blue-100">
-          <p className="font-bold text-blue-700">✓ फरम्यात सुझाभाउ:</p>
+          <p className="font-bold text-blue-700">✓ फरम्यात गाइड:</p>
           <ul className="space-y-0.5 ml-2">
             <li>• <strong>**पाठ**</strong> = बोल्ड</li>
             <li>• <strong>_पाठ_</strong> = इटालिक</li>

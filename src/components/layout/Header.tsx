@@ -148,53 +148,81 @@ export default function Header() {
   const [menuItems, setMenuItems] = useState<Array<{ label: string; slug?: string; url?: string; type: string }>>([]);
 
   useEffect(() => {
-    const fetchMenu = async () => {
+    let unsubscribeMenu: (() => void) | undefined;
+    let unsubscribeCategories: (() => void) | undefined;
+
+    const setupMenuListener = () => {
       try {
-        // Try to fetch primary navigation menu
+        // Real-time listener for menu
         const menuRef = doc(db, "navigation", "primary");
-        const menuSnap = await getDoc(menuRef);
         
-        if (menuSnap.exists()) {
-          const menuData = menuSnap.data();
-          const items = menuData.items || [];
-          
-          // Convert menu items to display format
-          const displayItems = items
-            .filter((item: any) => item.isVisible)
-            .map((item: any) => ({
-              label: item.label,
-              type: item.type,
-              slug: item.type === "category" ? item.categoryId : undefined,
-              url: item.type === "custom" ? item.url : undefined,
-              order: item.order
-            }))
-            .sort((a: any, b: any) => a.order - b.order);
-          
-          setMenuItems(displayItems);
-          return;
-        }
+        unsubscribeMenu = onSnapshot(
+          menuRef,
+          (menuSnap) => {
+            if (menuSnap.exists()) {
+              const menuData = menuSnap.data();
+              const items = menuData.items || [];
+              
+              // Convert menu items to display format
+              const displayItems = items
+                .filter((item: any) => item.isVisible)
+                .map((item: any) => ({
+                  label: item.label,
+                  type: item.type,
+                  slug: item.type === "category" ? item.categoryId : undefined,
+                  url: item.type === "custom" ? item.url : undefined,
+                  order: item.order
+                }))
+                .sort((a: any, b: any) => a.order - b.order);
+              
+              setMenuItems(displayItems);
+            } else {
+              // Menu doesn't exist yet, use fallback
+              setupCategoriesFallback();
+            }
+          },
+          (error) => {
+            console.warn("Menu listener error:", error);
+            setupCategoriesFallback();
+          }
+        );
       } catch (err) {
-        console.warn("Could not fetch menu, falling back to categories:", err);
+        console.warn("Could not setup menu listener:", err);
+        setupCategoriesFallback();
       }
-
-      // Fallback: Use categories if menu doesn't exist
-      const q = query(collection(db, "categories"), orderBy("order", "asc"));
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const cats = snapshot.docs.map(doc => { 
-          const data = doc.data();
-          return {
-            id: doc.id, 
-            name: data.nameNepali,
-            slug: data.slug
-          };
-        });
-        setCategories(cats);
-      });
-
-      return () => unsubscribe();
     };
-    
-    fetchMenu();
+
+    const setupCategoriesFallback = () => {
+      try {
+        const q = query(collection(db, "categories"), orderBy("order", "asc"));
+        unsubscribeCategories = onSnapshot(
+          q,
+          (snapshot) => {
+            const cats = snapshot.docs.map(doc => { 
+              const data = doc.data();
+              return {
+                id: doc.id, 
+                name: data.nameNepali,
+                slug: data.slug
+              };
+            });
+            setCategories(cats);
+          },
+          (error) => {
+            console.error("Categories listener error:", error);
+          }
+        );
+      } catch (err) {
+        console.warn("Could not setup categories listener:", err);
+      }
+    };
+
+    setupMenuListener();
+
+    return () => {
+      unsubscribeMenu?.();
+      unsubscribeCategories?.();
+    };
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
