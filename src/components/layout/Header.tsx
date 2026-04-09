@@ -523,13 +523,18 @@ export default function Header() {
           >
             <TrendingUp size={20} /> ट्रेन्डिङ
           </Link>
-          <div className="flex flex-col gap-4 pt-4">
+          <div className="flex flex-col gap-4 pt-4 border-t border-slate-100">
             {user ? (
-              <Link to="/admin" className="text-center py-3 rounded-xl bg-primary text-white font-bold" onClick={() => setIsMenuOpen(false)}>ड्यासबोर्ड</Link>
+              <>
+                <Link to={`/profile/${user.uid}`} className="flex items-center gap-2 py-3 px-4 bg-slate-50 rounded-xl font-bold text-slate-900 hover:bg-slate-100 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                  <User size={18} className="text-primary" /> मेरो प्रोफाइल
+                </Link>
+                <Link to={user.role === 'admin' ? '/admin' : user.role === 'editor' ? '/editor' : '/admin'} className="text-center py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-colors" onClick={() => setIsMenuOpen(false)}>ड्यासबोर्ड</Link>
+              </>
             ) : (
-              <Link to="/login" className="text-center py-3 rounded-xl bg-slate-100 font-bold text-slate-900" onClick={() => setIsMenuOpen(false)}>लगइन</Link>
+              <Link to="/login" className="text-center py-3 rounded-xl bg-slate-100 font-bold text-slate-900 hover:bg-slate-200 transition-colors" onClick={() => setIsMenuOpen(false)}>लगइन</Link>
             )}
-            <Link to="/live" className="text-center py-3 rounded-xl bg-slate-900 text-white font-bold" onClick={() => setIsMenuOpen(false)}>प्रत्यक्ष प्रसारण</Link>
+            <Link to="/live" className="text-center py-3 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-colors" onClick={() => setIsMenuOpen(false)}>प्रत्यक्ष प्रसारण</Link>
           </div>
         </div>
       )}

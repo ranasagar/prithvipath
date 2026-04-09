@@ -225,41 +225,6 @@ export default function AdminEditor() {
   };
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const editorRef = useRef<any>(null);
-  const editorInstanceRef = useRef<any>(null);
-
-  useEffect(() => {
-    // Initialize CKEditor if not already done
-    if (editorRef.current && !editorInstanceRef.current && (window as any).ClassicEditor) {
-      (window as any).ClassicEditor
-        .create(editorRef.current, {
-           toolbar: [
-            'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
-            'outdent', 'indent', '|', 'imageUpload', 'blockQuote', 'insertTable', 
-            'mediaEmbed', 'undo', 'redo'
-          ],
-        })
-        .then((editor: any) => {
-          editorInstanceRef.current = editor;
-          editor.setData(article.content || "");
-          editor.model.document.on('change:data', () => {
-            const data = editor.getData();
-            handleContentChange(data);
-          });
-        })
-        .catch((error: any) => {
-          console.error("CKEditor error:", error);
-        });
-    }
-
-    return () => {
-      if (editorInstanceRef.current) {
-        editorInstanceRef.current.destroy()
-          .then(() => { editorInstanceRef.current = null; })
-          .catch((err: any) => console.error("Editor destroy err:", err));
-      }
-    };
-  }, [loading]); // Re-init after loading article data
 
   const handleContentChange = (content: string) => {
     setArticle(prev => {
@@ -384,39 +349,20 @@ export default function AdminEditor() {
               />
             </div>
 
-            {/* WYSIWYG Editor */}
+            {/* Content Editor with Nepali Transliteration */}
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                  <Globe size={14} className="text-primary" /> मुख्य सामग्री (Content)
-                </label>
-              </div>
-              <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-visible relative flex flex-col">
-                {/* CKEditor Container */}
-                <div className="ck-editor-container min-h-[500px]">
-                  <div ref={editorRef}></div>
-                </div>
-                
-                <style>{`
-                  .ck-editor__editable_inline {
-                      min-height: 500px;
-                      border-radius: 0 0 2.5rem 2.5rem !important;
-                      padding: 2rem !important;
-                      font-size: 1.125rem;
-                      color: #475569;
-                  }
-                  .ck-toolbar {
-                      border-radius: 2.5rem 2.5rem 0 0 !important;
-                      padding: 1rem !important;
-                      background: #f8fafc !important;
-                      border-color: #f1f5f9 !important;
-                  }
-                  .ck.ck-editor__main>.ck-editor__editable {
-                      border-color: #f1f5f9 !important;
-                      box-shadow: none !important;
-                  }
-                `}</style>
-              </div>
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <Globe size={14} className="text-primary" /> मुख्य सामग्री (Content)
+                <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold">नेपाली अनुवाद समर्थित</span>
+              </label>
+              <NepaliInput 
+                value={article.content || ""}
+                onChange={handleContentChange}
+                placeholder="समाचारको मुख्य सामग्री यहाँ लेख्नुहोस्... (अङ्ग्रेजीमा लेखेपछि नेपालीमा स्वचालित अनुवाद हुन्छ)"
+                className="w-full bg-white border border-slate-100 rounded-[2rem] p-8 text-lg font-medium text-slate-600 outline-none focus:ring-4 focus:ring-primary/5 transition-all shadow-sm"
+                type="textarea"
+                rows={12}
+              />
             </div>
           </div>
         </main>
