@@ -157,28 +157,52 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-slate-50">
         <Header />
-        <main className="flex-grow pb-12">
+        <main className="flex-grow pb-12 pt-6 md:pt-15">
           <div className="container-custom">
+            {/* Hero Section Skeleton */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
               <div className="lg:col-span-8">
                 <Skeleton className="aspect-video md:aspect-[16/8] w-full rounded-3xl" />
               </div>
               <div className="lg:col-span-4 flex flex-col gap-6">
-                <Skeleton className="h-10 w-48" />
-                <div className="flex flex-col gap-6">
-                  {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
+                <Skeleton className="h-8 w-40 rounded-xl" />
+                <div className="flex flex-col gap-4">
+                  {[1, 2, 3, 4, 5].map(i => (
+                    <div key={i} className="flex gap-4">
+                      <Skeleton className="w-20 h-20 rounded-2xl flex-shrink-0" />
+                      <div className="flex-grow flex flex-col gap-2">
+                        <Skeleton className="h-4 w-full rounded-lg" />
+                        <Skeleton className="h-3 w-3/4 rounded-lg" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
+
+            {/* Category Section Skeletons */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-              <div className="lg:col-span-8 flex flex-col gap-10">
+              <div className="lg:col-span-8 flex flex-col gap-20">
+                <CategoryBlockSkeleton />
                 <CategoryBlockSkeleton />
                 <CategoryBlockSkeleton />
               </div>
               <div className="lg:col-span-4">
-                <Skeleton className="h-[600px] w-full rounded-3xl" />
+                <div className="flex flex-col gap-6">
+                  <Skeleton className="h-8 w-32 rounded-xl" />
+                  <div className="flex gap-2 mb-6">
+                    {[1, 2, 3].map(i => (
+                      <Skeleton key={i} className="h-8 w-20 rounded-full" />
+                    ))}
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <Skeleton key={i} className="h-24 w-full rounded-2xl" />
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
