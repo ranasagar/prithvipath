@@ -161,23 +161,32 @@ export default function Header() {
           (menuSnap) => {
             if (menuSnap.exists()) {
               const menuData = menuSnap.data();
-              const items = menuData.items || [];
+              console.log("Header: Menu snapshot received", menuData);
               
-              // Convert menu items to display format
-              const displayItems = items
-                .filter((item: any) => item.isVisible)
-                .map((item: any) => ({
-                  label: item.label,
-                  type: item.type,
-                  slug: item.type === "category" ? item.categoryId : undefined,
-                  url: item.type === "custom" ? item.url : undefined,
-                  order: item.order
-                }))
-                .sort((a: any, b: any) => a.order - b.order);
-              
-              setMenuItems(displayItems);
+              if (menuData && Array.isArray(menuData.items) && menuData.items.length > 0) {
+                const items = menuData.items || [];
+                
+                // Convert menu items to display format
+                const displayItems = items
+                  .filter((item: any) => item.isVisible !== false)
+                  .map((item: any) => ({
+                    label: item.label,
+                    type: item.type,
+                    slug: item.type === "category" ? item.categoryId : undefined,
+                    url: item.type === "custom" ? item.url : undefined,
+                    order: item.order || 999
+                  }))
+                  .sort((a: any, b: any) => (a.order || 999) - (b.order || 999));
+                
+                console.log("Header: Processed menu items", displayItems);
+                setMenuItems(displayItems);
+                return; // Success, don't fall back to categories
+              } else {
+                console.log("Header: No menu items found, using fallback");
+                setupCategoriesFallback();
+              }
             } else {
-              // Menu doesn't exist yet, use fallback
+              console.log("Header: Menu document doesn't exist, using fallback");
               setupCategoriesFallback();
             }
           },
@@ -198,6 +207,7 @@ export default function Header() {
         unsubscribeCategories = onSnapshot(
           q,
           (snapshot) => {
+            console.log("Header: Using categories fallback");
             const cats = snapshot.docs.map(doc => { 
               const data = doc.data();
               return {

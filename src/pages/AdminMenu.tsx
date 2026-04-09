@@ -37,38 +37,65 @@ export default function AdminMenu() {
   useEffect(() => {
     const setupData = async () => {
       try {
-        // Fetch Primary Menu
+        // Fetch Primary Menu  
         const menuRef = doc(db, "navigation", "primary");
-        const menuDoc = await getDoc(menuRef);
         
-        if (menuDoc.exists()) {
-          setMenu({ id: "primary", ...menuDoc.data() } as Navigation);
-        } else {
-          // Create default menu
-          const defaultMenu: Navigation = {
-            id: "primary",
-            name: "Primary Navigation",
-            location: "primary",
-            items: [],
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          };
-          await setDoc(menuRef, defaultMenu);
-          setMenu(defaultMenu);
-        }
+        // Use real-time listener to always get latest
+        const unsubscribe = onSnapshot(
+          menuRef,
+          (menuDoc) => {
+            if (menuDoc.exists()) {
+              const data = menuDoc.data();
+              console.log("Menu loaded from Firestore:", data);
+              setMenu({ 
+                id: "primary",
+                name: data.name || "Primary Navigation",
+                location: data.location || "primary",
+                items: Array.isArray(data.items) ? data.items : [],
+                isActive: data.isActive !== false,
+                createdAt: data.createdAt || new Date().toISOString(),
+                updatedAt: data.updatedAt || new Date().toISOString()
+              } as Navigation);
+            } else {
+              // Create default menu
+              const defaultMenu: Navigation = {
+                id: "primary",
+                name: "Primary Navigation",
+                location: "primary",
+                items: [],
+                isActive: true,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              };
+              console.log("Creating default menu");
+              await setDoc(menuRef, defaultMenu);
+              setMenu(defaultMenu);
+            }
+          },
+          (error) => {
+            console.error("Menu listener error:", error);
+            setAlert({
+              show: true,
+              title: "त्रुटि!",
+              message: "मेनु डेटा लोड गर्दा त्रुटि भयो। कृपया पुनः प्रयास गर्नुहोस्।",
+              type: 'error'
+            });
+          }
+        );
 
         // Fetch Categories
         const q = query(collection(db, "categories"), orderBy("order", "asc"));
         const snapshot = await getDocs(q);
         const cats = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Category));
         setCategories(cats);
+
+        return () => unsubscribe();
       } catch (error) {
-        console.error("Error loading menu data:", error);
+        console.error("Error loading data:", error);
         setAlert({
           show: true,
           title: "त्रुटि!",
-          message: "मेनु डेटा लोड गर्दा त्रुटि भयो। कृपया पुनः प्रयास गर्नुहोस्।",
+          message: "डेटा लोड गर्दा त्रुटि भयो। कृपया पुनः प्रयास गर्नुहोस्।",
           type: 'error'
         });
       }
@@ -115,27 +142,58 @@ export default function AdminMenu() {
   };
 
   const handleSave = async () => {
-    if (!menu) return;
+    if (!menu || menu.items.length === 0) {
+      setAlert({
+        show: true,
+        title: "सूचना",
+        message: "सुरक्षित गर्नको लागी कम्तीमा एक मेनु वस्तु थप्नुहोस्।",
+        type: 'error'
+      });
+      return;
+    }
+    
     setSaving(true);
     try {
-      const updatedMenu = {
-        ...menu,
-        updatedAt: new Date().toISOString(),
-        items: menu.items.map((item, idx) => ({
-          ...item,
-          order: idx + 1
-        }))
+      const now = new Date().toISOString();
+      
+      // Ensure all items have required fields
+      const itemsToSave = menu.items.map((item, idx) => ({
+        id: item.id || `item-${Date.now()}-${idx}`,
+        label: item.label,
+        type: item.type,
+        url: item.type === "custom" ? item.url : undefined,
+        categoryId: item.type === "category" ? item.categoryId : undefined,
+        order: idx + 1,
+        isVisible: item.isVisible !== false,
+        icon: item.icon,
+        isParent: item.isParent || false
+      } as MenuItem));
+      
+      const menuToSave = {
+        id: menu.id,
+        name: menu.name,
+        location: menu.location,
+        items: itemsToSave,
+        isActive: true,
+        createdAt: menu.createdAt,
+        updatedAt: now
       };
       
-      await setDoc(doc(db, "navigation", menu.id), updatedMenu);
-      setMenu(updatedMenu);
+      console.log("Saving menu to Firestore:", menuToSave);
+      
+      await setDoc(doc(db, "navigation", menu.id), menuToSave);
+      
+      // Update local state
+      setMenu(menuToSave as Navigation);
       
       setAlert({
         show: true,
         title: "सफलता!",
-        message: "मेनु सफलतापूर्वक सुरक्षित गरियो। हेडरमा परिवर्तनहरू देखा पर्नेछ।",
+        message: `${itemsToSave.length} वस्तु सफलतापूर्वक सुरक्षित गरियो। हेडरमा परिवर्तनहरू देखा पर्नेछ।`,
         type: 'success'
       });
+      
+      console.log("Menu saved successfully");
     } catch (err) {
       console.error("Save error:", err);
       setAlert({
