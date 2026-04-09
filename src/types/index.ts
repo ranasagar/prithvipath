@@ -133,3 +133,29 @@ export interface Ad {
   createdAt: any;
   updatedAt: any;
 }
+
+export type MenuItemType = "category" | "link" | "page" | "custom";
+
+export interface MenuItem {
+  id: string;
+  label: string;
+  type: MenuItemType;
+  url?: string;
+  categoryId?: string;
+  icon?: string;
+  order: number;
+  isVisible: boolean;
+  isParent?: boolean;
+  parentId?: string;
+  children?: MenuItem[];
+}
+
+export interface Navigation {
+  id: string;
+  name: string;
+  location: "primary" | "secondary" | "footer" | "mobile";
+  items: MenuItem[];
+  isActive: boolean;
+  createdAt: any;
+  updatedAt: any;
+}

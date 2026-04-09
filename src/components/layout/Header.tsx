@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, Menu, X, User, Clock, TrendingUp, Bell, CheckCircle, AlertCircle, Info, LogOut, LayoutDashboard, MessageCircle, Youtube as YoutubeIcon } from "lucide-react";
-import { collection, query, where, orderBy, limit, onSnapshot, doc, updateDoc, writeBatch, getDocs } from "firebase/firestore";
+import { collection, query, where, orderBy, limit, onSnapshot, doc, updateDoc, writeBatch, getDocs, getDoc } from "firebase/firestore";
 import { db } from "@/src/lib/firebase";
 import { useAuth } from "@/src/lib/auth";
 import type { Notification, Article } from "@/src/types";
@@ -145,10 +145,60 @@ export default function Header() {
   }, []);
 
   const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([]);
+  const [menuItems, setMenuItems] = useState<Array<{ label: string; slug?: string; url?: string; type: string }>>([]);
 
   useEffect(() => {
-    const q = query(collection(db, "categories"), orderBy("order", "asc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const fetchMenu = async () => {
+      try {
+        // Try to fetch primary navigation menu
+        const menuRef = doc(db, "navigation", "primary");
+        const menuSnap = await getDoc(menuRef);
+        
+        if (menuSnap.exists()) {
+          const menuData = menuSnap.data();
+          const items = menuData.items || [];
+          
+          // Convert menu items to display format
+          const displayItems = items
+            .filter((item: any) => item.isVisible)
+            .map((item: any) => ({
+              label: item.label,
+              type: item.type,
+              slug: item.type === "category" ? item.categoryId : undefined,
+              url: item.type === "custom" ? item.url : undefined,
+              order: item.order
+            }))
+            .sort((a: any, b: any) => a.order - b.order);
+          
+          setMenuItems(displayItems);
+          return;
+        }
+      } catch (err) {
+        console.warn("Could not fetch menu, falling back to categories:", err);
+      }
+
+      // Fallback: Use categories if menu doesn't exist
+      const q = query(collection(db, "categories"), orderBy("order", "asc"));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const cats = snapshot.docs.map(doc => { 
+          const data = doc.data();
+          return {
+            id: doc.id, 
+            name: data.nameNepali,
+            slug: data.slug
+          };
+        });
+        setCategories(cats);
+      });
+
+      return () => unsubscribe();
+    };
+    
+    fetchMenu();
+  }, []);
+
+  // Import getDoc
+  const { getDoc } = require("firebase/firestore");
       const cats = snapshot.docs.map(doc => ({ 
         id: doc.id,
         name: doc.data().nameNepali, 
@@ -236,17 +286,45 @@ export default function Header() {
               <li>
                 <Link to="/" className="text-[11px] md:text-xs lg:text-xs font-black text-slate-900 hover:text-primary transition-colors uppercase truncate">गृहपृष्ठ</Link>
               </li>
-              {categories.map((cat) => (
-                <li key={cat.id} className="hidden lg:block">
-                  <Link 
-                    to={`/category/${cat.slug}`} 
-                    className="text-xs font-bold text-slate-600 hover:text-primary transition-colors uppercase tracking-tight truncate max-w-[100px] whitespace-nowrap"
-                    title={cat.name}
-                  >
-                    {cat.name}
-                  </Link>
-                </li>
-              ))}
+              {menuItems.length > 0 
+                ? menuItems.map((item, idx) => (
+                    <li key={idx} className="hidden lg:block">
+                      {item.type === "category" && item.slug ? (
+                        <Link 
+                          to={`/category/${item.slug}`} 
+                          className="text-xs font-bold text-slate-600 hover:text-primary transition-colors uppercase tracking-tight truncate max-w-[100px] whitespace-nowrap"
+                          title={item.label}
+                        >
+                          {item.label}
+                        </Link>
+                      ) : item.type === "custom" && item.url ? (
+                        <a 
+                          href={item.url} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="text-xs font-bold text-slate-600 hover:text-primary transition-colors uppercase tracking-tight truncate max-w-[100px] whitespace-nowrap"
+                          title={item.label}
+                        >
+                          {item.label}
+                        </a>
+                      ) : (
+                        <span className="text-xs font-bold text-slate-600 uppercase tracking-tight truncate max-w-[100px] whitespace-nowrap">
+                          {item.label}
+                        </span>
+                      )}
+                    </li>
+                  ))
+                : categories.map((cat) => (
+                  <li key={cat.id} className="hidden lg:block">
+                    <Link 
+                      to={`/category/${cat.slug}`} 
+                      className="text-xs font-bold text-slate-600 hover:text-primary transition-colors uppercase tracking-tight truncate max-w-[100px] whitespace-nowrap"
+                      title={cat.name}
+                    >
+                      {cat.name}
+                    </Link>
+                  </li>
+                ))}
               <li key="latest" className="hidden lg:block">
                 <Link 
                   to="/latest" 

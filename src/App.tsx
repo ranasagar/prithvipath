@@ -9,6 +9,7 @@ import AdminSettings from "./pages/AdminSettings";
 import AdminCategories from "./pages/AdminCategories";
 import AdminAds from "./pages/AdminAds";
 import AdminSetupGuide from "./pages/AdminSetupGuide";
+import AdminMenu from "./pages/AdminMenu";
 import CategoryPage from "./pages/CategoryPage";
 import ArticlePage from "./pages/ArticlePage";
 import DistrictPage from "./pages/DistrictPage";
@@ -94,6 +95,11 @@ function AnimatedRoutes() {
         <Route path="/admin/categories" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <CinematicTransition><AdminCategories /></CinematicTransition>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/menu" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <CinematicTransition><AdminMenu /></CinematicTransition>
           </ProtectedRoute>
         } />
         <Route path="/admin/ads" element={

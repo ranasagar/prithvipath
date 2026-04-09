@@ -65,6 +65,12 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }: AdminSideb
       show: isAdmin
     },
     { 
+      icon: Menu, 
+      label: "मेनू सम्पादन", 
+      path: "/admin/menu",
+      show: isAdmin
+    },
+    { 
       icon: Megaphone, 
       label: "विज्ञापनहरू", 
       path: "/admin/ads",

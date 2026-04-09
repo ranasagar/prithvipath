@@ -256,6 +256,9 @@ export default function AdminDashboard() {
             >
               <Database size={20} /> {seeding ? "सीडिङ..." : "डमी डेटा थप्नुहोस्"}
             </button>
+            <Link to="/admin/menu" className="bg-slate-100 text-slate-600 px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-slate-200 transition-all">
+              <Settings size={20} /> मेनु संपादन
+            </Link>
             <Link to="/admin/editor" className="bg-primary text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
               <Plus size={20} /> नयाँ समाचार
             </Link>
