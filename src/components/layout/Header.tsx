@@ -197,35 +197,6 @@ export default function Header() {
     fetchMenu();
   }, []);
 
-  // Import getDoc
-  const { getDoc } = require("firebase/firestore");
-      const cats = snapshot.docs.map(doc => ({ 
-        id: doc.id,
-        name: doc.data().nameNepali, 
-        slug: doc.data().slug 
-      }));
-      const uniqueCats = Array.from(new Map(cats.map(c => [c.slug, c])).values());
-      if (uniqueCats.length > 0) {
-        setCategories(uniqueCats);
-      } else {
-        // Fallback to defaults if none in DB
-        setCategories([
-          { id: "politics", name: "राजनीति", slug: "politics" },
-          { id: "desh", name: "देश", slug: "desh" },
-          { id: "pradesh", name: "प्रदेश", slug: "pradesh" },
-          { id: "bishwo", name: "विश्व", slug: "bishwo" },
-          { id: "sports", name: "खेलकुद", slug: "sports" },
-          { id: "entertainment", name: "मनोरञ्जन", slug: "entertainment" },
-          { id: "economy", name: "अर्थ", slug: "economy" },
-          { id: "tech", name: "प्रविधि", slug: "tech" },
-        ]);
-      }
-    }, (error) => {
-      console.error("Error in categories snapshot:", error);
-    });
-    return () => unsubscribe();
-  }, []);
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
