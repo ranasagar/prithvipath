@@ -13,6 +13,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isMobileProfileOpen, setIsMobileProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
   const [currentDate, setCurrentDate] = useState("");
@@ -426,6 +427,38 @@ export default function Header() {
                 )}
               </button>
             </div>
+
+            {/* Profile Icon for Mobile */}
+            {user ? (
+              <div className="relative">
+                <button 
+                  onClick={() => setIsMobileProfileOpen(!isMobileProfileOpen)}
+                  className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 overflow-hidden border-2 border-transparent hover:border-primary transition-all flex-shrink-0"
+                >
+                  {user.photoURL ? (
+                    <img src={user.photoURL} alt={user.displayName} className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={16} className="text-slate-500" />
+                  )}
+                </button>
+                {isMobileProfileOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-white shadow-2xl rounded-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                    <div className="p-3 border-b border-slate-100 bg-slate-50">
+                      <p className="text-xs font-black text-slate-900 truncate">{user.displayName || 'प्रयोगकर्ता'}</p>
+                      <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
+                    </div>
+                    <Link to={`/profile/${user.uid}`} className="flex items-center gap-2 px-4 py-3 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-primary transition-colors" onClick={() => setIsMobileProfileOpen(false)}>
+                      <User size={14} /> मेरो प्रोफाइल
+                    </Link>
+                    {(user.role === 'admin' || user.role === 'editor') && (
+                      <Link to={user.role === 'admin' ? "/admin" : "/editor"} className="flex items-center gap-2 px-4 py-3 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-primary transition-colors border-t border-slate-50" onClick={() => setIsMobileProfileOpen(false)}>
+                        <LayoutDashboard size={14} /> ड्यासबोर्ड
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : null}
 
             <button 
               className="p-2 text-slate-600 flex-shrink-0"
